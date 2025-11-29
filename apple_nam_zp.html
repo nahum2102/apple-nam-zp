@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tienda Apple</title>
+
+  <style>
+    :root{--bg:#f5f5f7;--card:#fff;--accent:#0071e3;--success:#34c759}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial, sans-serif;background:var(--bg);color:#111}
+    header{background:#000;color:#fff;padding:18px 20px;text-align:center;font-weight:700}
+
+    .wrap{
+      width:95%;max-width:1200px;margin:24px auto;
+      display:grid;grid-template-columns:1fr 360px;gap:24px
+    }
+
+    .catalogo{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+      gap:18px;
+    }
+
+    .producto{
+      background:var(--card);border-radius:12px;padding:14px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.08);
+      text-align:center;
+    }
+
+    .carousel{
+      width:100%;
+      height:160px;
+      position:relative;
+      overflow:hidden;
+      border-radius:10px;
+      margin-bottom:10px;
+    }
+
+    .carousel img{
+      width:100%;height:100%;object-fit:cover;
+    }
+
+    .btn-slide{
+      position:absolute;
+      top:50%;transform:translateY(-50%);
+      background:rgba(0,0,0,0.4);
+      color:white;border:none;border-radius:6px;
+      padding:6px 10px;cursor:pointer;
+    }
+    .prev{left:5px}
+    .next{right:5px}
+
+    .producto h4{margin:8px 0;font-size:16px}
+    .producto .precio{font-weight:bold;margin:6px 0}
+
+    .btn{
+      padding:8px 12px;border-radius:8px;border:0;cursor:pointer;
+    }
+    .btn-comprar{background:var(--accent);color:#fff}
+
+    aside{
+      background:#fff;padding:16px;border-radius:12px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.1);
+    }
+
+    .linea-item{
+      display:flex;justify-content:space-between;padding:6px 0;
+      border-bottom:1px solid #eee
+    }
+
+    .btn-eliminar{
+      background:#ff3b30;color:#fff;border:0;border-radius:6px;
+      padding:6px 8px;cursor:pointer;
+    }
+
+    .btn-finalizar{
+      background:var(--success);color:#fff;width:100%;
+      border:0;border-radius:8px;padding:10px;margin-top:12px;
+      cursor:pointer;font-weight:bold;
+    }
+
+    input{
+      width:100%;padding:8px;border-radius:8px;border:1px solid #ccc;margin-bottom:10px;
+    }
+
+    @media(max-width:900px){
+      .wrap{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+
+<body>
+
+<header>APPLE_NAM_ZP</header>
+<div style="text-align:center; margin-top:12px;">
+  <a href="https://www.instagram.com/apple_nam_zp?igsh=aWFqNjQwb3RmaDRs" 
+     target="_blank"
+     style="
+      background: linear-gradient(45deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
+        color:white;
+        padding:10px 18px;
+        border-radius:10px;
+        text-decoration:none;
+        font-weight:bold;
+        display:inline-block;
+     ">
+     Síguenos en Instagram
+  </a>
+</div>
+
+
+<div class="wrap">
+
+  <section id="catalogo" class="catalogo"></section>
+
+  <aside>
+    <h3>Carrito</h3>
+    <div id="carritoItems"><p>El carrito está vacío.</p></div>
+    <div id="total" style="font-weight:bold;margin-top:10px">Total: $0</div>
+
+    <h3>Datos de Envío</h3>
+    <input id="calle" placeholder="Calle y número">
+    <input id="colonia" placeholder="Colonia">
+    <input id="municipio" placeholder="Municipio">
+    <input id="estado" placeholder="Estado">
+
+    <button class="btn-finalizar" onclick="enviarWhatsapp()">Enviar Pedido por WhatsApp</button>
+
+  </aside>
+
+</div>
+
+<script>
+const productos = [
+  {
+    id:1,
+    nombre:"AirPods 2 Pro",
+    precio: 450,
+    imagenes:[
+      "IMG-1230.webp",
+      "IMG-1232.webp",
+      "IMG-1235.webp" 
+    ]
+  },
+  {
+    id:2,
+    nombre:"AirPods 3ra Generación",
+    precio: 450,
+    imagenes:[
+      "E14433AB-04B2-4D85-8821-764E59DE4FE6.webp",
+      "DF7EDE8C-9CE1-4436-B993-4094D12430DF.webp",
+      "D3617BDC-8397-48C0-B488-CAAC985058B9.webp",
+      "B82AA671-AEA6-4E14-B9E5-D243345B3999.webp"
+    ]
+  },
+  {
+    id:3,
+    nombre:"Cargador USB-C 35W",
+    precio: 250,
+    imagenes:[
+      "82B70C5A-37C7-4337-8C92-CD52E626A8C1.webp",
+      "926667B9-EC57-43F3-A745-544619645143.webp"
+    ]
+  },
+  {
+    id:4,
+    nombre:"Cable Lightning Original",
+    precio: 250,
+    imagenes:[
+      "4FF89AC7-8830-4A38-B846-F11A91BE8560.webp",
+      "5C736A05-5843-4569-A60B-35ADC7E40789.webp"
+    ]
+  },
+  {
+    id:5,
+    nombre:"Batería MagSafe",
+    precio:300,
+    imagenes:[
+      "3E6EF8DC-C60E-4895-8492-9791AB026C79.webp",
+      "A4D0C978-7C77-4380-A5DF-8EB5E4B08675.webp",
+      "7DE9498AD-7C7C-4BD9-BAAE-C4F040713397.webp"
+    ]
+  }
+];
+
+let carrito = [];
+
+function renderizarCatalogo(){
+  const cont = document.getElementById("catalogo");
+  cont.innerHTML = "";
+
+  productos.forEach(p=>{
+    const div = document.createElement("div");
+    div.className = "producto";
+
+    div.innerHTML = `
+      <div class="carousel" data-id="${p.id}">
+        <img src="${p.imagenes[0]}" data-index="0">
+        <button class="btn-slide prev">‹</button>
+        <button class="btn-slide next">›</button>
+      </div>
+
+      <h4>${p.nombre}</h4>
+      <div class="precio">$${p.precio}</div>
+      <button class="btn btn-comprar" onclick="agregarCarrito(${p.id})">Comprar</button>
+    `;
+
+    cont.appendChild(div);
+  });
+
+  activarCarruseles();
+}
+
+function activarCarruseles(){
+  document.querySelectorAll(".carousel").forEach(carrusel => {
+
+    const id = carrusel.dataset.id;
+    const producto = productos.find(p=>p.id==id);
+    const img = carrusel.querySelector("img");
+
+    let index = 0;
+
+    carrusel.querySelector(".next").onclick = ()=>{
+      index = (index + 1) % producto.imagenes.length;
+      img.src = producto.imagenes[index];
+    };
+
+    carrusel.querySelector(".prev").onclick = ()=>{
+      index = (index - 1 + producto.imagenes.length) % producto.imagenes.length;
+      img.src = producto.imagenes[index];
+    };
+
+  });
+}
+
+function agregarCarrito(id){
+  const p = productos.find(x=>x.id===id);
+  let item = carrito.find(x=>x.id===id);
+
+  if(item) item.cantidad++;
+  else carrito.push({id:p.id,nombre:p.nombre,precio:p.precio,cantidad:1});
+
+  actualizarCarrito();
+}
+
+function actualizarCarrito(){
+  const cont = document.getElementById("carritoItems");
+  cont.innerHTML = "";
+
+  if(carrito.length === 0){
+    cont.innerHTML = "<p>El carrito está vacío.</p>";
+    document.getElementById("total").innerText = "Total: $0";
+    return;
+  }
+
+  let total = 0;
+
+  carrito.forEach(i=>{
+    const sub = i.precio * i.cantidad;
+    total += sub;
+
+    cont.innerHTML += `
+      <div class="linea-item">
+        <div>
+          <b>${i.nombre}</b><br>
+          $${i.precio} x ${i.cantidad} = $${sub}
+        </div>
+        <button class="btn-eliminar" onclick="eliminar(${i.id})">X</button>
+      </div>
+    `;
+  });
+
+  document.getElementById("total").innerText = "Total: $" + total;
+}
+
+function eliminar(id){
+  carrito = carrito.filter(i=>i.id!==id);
+  actualizarCarrito();
+}
+
+/* ============================================
+   AHORA ENVÍA EL PEDIDO COMPLETO POR WHATSAPP
+   ============================================ */
+function enviarWhatsapp(){
+  if(carrito.length === 0){
+    alert("El carrito está vacío.");
+    return;
+  }
+
+  let calle = document.getElementById("calle").value.trim();
+  let colonia = document.getElementById("colonia").value.trim();
+  let municipio = document.getElementById("municipio").value.trim();
+  let estado = document.getElementById("estado").value.trim();
+
+  if(!calle || !colonia || !municipio || !estado){
+    alert("Completa todos los datos de envío.");
+    return;
+  }
+
+  let mensaje = "📦 *NUEVO PEDIDO*\n\n";
+
+  carrito.forEach(i=>{
+    mensaje += `• ${i.nombre} x${i.cantidad} = $${i.cantidad * i.precio}\n`;
+  });
+
+  let total = carrito.reduce((a,b)=>a + (b.precio*b.cantidad),0);
+
+  mensaje += `\n💰 *TOTAL:* $${total}\n\n📍 *DOMICILIO*\n`;
+  mensaje += `Calle: ${calle}\nColonia: ${colonia}\nMunicipio: ${municipio}\nEstado: ${estado}\n\n`;
+
+  const numero = "8141261141";
+
+  const url = `https://wa.me/52${numero}?text=${encodeURIComponent(mensaje)}`;
+
+  window.open(url, "_blank");
+
+  carrito = [];
+  actualizarCarrito();
+}
+
+renderizarCatalogo();
+actualizarCarrito();
+</script>
+
+</body>
+</html>
