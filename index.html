@@ -36,27 +36,32 @@ input{width:100%;padding:8px;border-radius:8px;border:1px solid #ccc;margin-bott
 <header>PEAR STORE</header>
 
 <div style="text-align:center; margin-top:12px;">
-<a href="https://www.instagram.com/pear_storre" target="_blank" style="background: linear-gradient(45deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5); color:white; padding:10px 18px; border-radius:10px; text-decoration:none; font-weight:bold; display:inline-block;">
+<a href="https://www.instagram.com/pear_storre" target="_blank"
+style="background: linear-gradient(45deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
+color:white; padding:10px 18px; border-radius:10px; text-decoration:none; font-weight:bold;">
 Síguenos en Instagram
 </a>
 </div>
 
 <div class="wrap">
   <section id="catalogo" class="catalogo"></section>
+
   <aside>
     <h3>Carrito</h3>
     <div id="carritoItems"><p>El carrito está vacío.</p></div>
     <div id="total" style="font-weight:bold;margin-top:10px">Total: $0</div>
+
     <h3>Datos de Envío</h3>
     <input id="calle" placeholder="Calle y número">
     <input id="colonia" placeholder="Colonia">
     <input id="municipio" placeholder="Municipio">
+
     <button class="btn-finalizar" onclick="enviarPedido()">Enviar Pedido</button>
   </aside>
 </div>
 
 <script>
-const SCRIPT_URL = "TU_URL_DE_GOOGLE_SCRIPT"; // Reemplaza con tu Web App de Google Apps Script
+const SCRIPT_URL = "TU_URL_DE_GOOGLE_SCRIPT"; // Reemplaza con tu Web App
 
 const productos = [
   {id:1,nombre:"AirPods 2 Pro",precio:450,imagenes:["IMG-1235.webp","IMG-1232.webp","IMG-1235.webp"]},
@@ -68,6 +73,7 @@ const productos = [
 
 let carrito = [];
 
+// Render catálogo
 function renderizarCatalogo(){
   const cont=document.getElementById("catalogo");
   cont.innerHTML="";
@@ -100,37 +106,57 @@ function activarCarruseles(){
   });
 }
 
+// Carrito
 function agregarCarrito(id){
   const p=productos.find(x=>x.id===id);
   let item=carrito.find(x=>x.id===id);
-  if(item) item.cantidad++; else carrito.push({id:p.id,nombre:p.nombre,precio:p.precio,cantidad:1});
+  if(item) item.cantidad++;
+  else carrito.push({id:p.id,nombre:p.nombre,precio:p.precio,cantidad:1});
   actualizarCarrito();
 }
 
 function actualizarCarrito(){
   const cont=document.getElementById("carritoItems");
   cont.innerHTML="";
-  if(carrito.length===0){cont.innerHTML="<p>El carrito está vacío.</p>"; document.getElementById("total").innerText="Total: $0"; return;}
+  if(carrito.length===0){
+    cont.innerHTML="<p>El carrito está vacío.</p>";
+    document.getElementById("total").innerText="Total: $0";
+    return;
+  }
+
   let total=0;
   carrito.forEach(i=>{
     const sub=i.precio*i.cantidad; total+=sub;
-    cont.innerHTML+=`<div class="linea-item"><div><b>${i.nombre}</b><br>$${i.precio} x ${i.cantidad} = $${sub}</div><button class="btn-eliminar" onclick="eliminar(${i.id})">X</button></div>`;
+    cont.innerHTML+=`
+      <div class="linea-item">
+        <div><b>${i.nombre}</b><br>$${i.precio} x ${i.cantidad} = $${sub}</div>
+        <button class="btn-eliminar" onclick="eliminar(${i.id})">X</button>
+      </div>`;
   });
+
   document.getElementById("total").innerText="Total: $"+total;
 }
 
-function eliminar(id){carrito=carrito.filter(i=>i.id!==id); actualizarCarrito();}
+function eliminar(id){
+  carrito=carrito.filter(i=>i.id!==id);
+  actualizarCarrito();
+}
 
+// Enviar pedido
 function enviarPedido(){
   if(carrito.length===0){alert("El carrito está vacío"); return;}
+
   const calle=document.getElementById("calle").value.trim();
   const colonia=document.getElementById("colonia").value.trim();
   const municipio=document.getElementById("municipio").value.trim();
-  const estado=document.getElementById("estado").value.trim();
-  if(!calle||!colonia||!municipio||!estado){alert("Completa todos los datos de envío."); return;}
+
+  if(!calle||!colonia||!municipio){
+    alert("Completa todos los datos de envío.");
+    return;
+  }
 
   const pedido = {
-    cliente: {calle,colonia,municipio,estado},
+    cliente: {calle,colonia,municipio},
     productos: carrito,
     total: carrito.reduce((a,b)=>a+b.precio*b.cantidad,0),
     fecha: new Date().toLocaleString()
@@ -142,19 +168,25 @@ function enviarPedido(){
     body: JSON.stringify(pedido),
     headers: {"Content-Type":"application/json"}
   }).then(res=>res.json())
-    .then(data=>{alert("Pedido registrado en Google Sheets correctamente");})
+    .then(()=>{alert("Pedido registrado en Google Sheets correctamente");})
     .catch(err=>{console.error("Error enviando a Sheets",err);});
 
-  // Enviar por WhatsApp
+  // WhatsApp
   let mensaje="📦 *NUEVO PEDIDO*\n\n";
-  carrito.forEach(i=>{mensaje+=`• ${i.nombre} x${i.cantidad} = $${i.cantidad*i.precio}\n`});
+  carrito.forEach(i=>{
+    mensaje+=`• ${i.nombre} x${i.cantidad} = $${i.cantidad*i.precio}\n`;
+  });
+
   let total=carrito.reduce((a,b)=>a+(b.precio*b.cantidad),0);
-  mensaje+=`\n💰 *TOTAL:* $${total}\n\n📍 *DOMICILIO*\nCalle: ${calle}\nColonia: ${colonia}\nMunicipio: ${municipio}\nEstado: ${estado}\n\n`;
+
+  mensaje+=`\n💰 *TOTAL:* $${total}\n\n📍 *DOMICILIO*\nCalle: ${calle}\nColonia: ${colonia}\nMunicipio: ${municipio}\n\n`;
+
   const numero="8141261141";
   const url=`https://wa.me/52${numero}?text=${encodeURIComponent(mensaje)}`;
   window.open(url,"_blank");
 
-  carrito=[]; actualizarCarrito();
+  carrito=[];
+  actualizarCarrito();
 }
 
 renderizarCatalogo();
@@ -163,6 +195,3 @@ actualizarCarrito();
 
 </body>
 </html>
-
-
-
