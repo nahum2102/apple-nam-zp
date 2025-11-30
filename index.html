@@ -120,21 +120,38 @@ input{
   margin-top:8px; font-size:14px;
 }
 
+/* ----------------------- */
+/* BOTÓN INSTAGRAM MODERNO */
+/* ----------------------- */
+.btn-instagram{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:12px 20px;
+  border-radius:12px;
+  font-weight:bold;
+  font-size:15px;
+  color:white;
+  background:linear-gradient(45deg, #000, #444);
+  transition:0.3s;
+  margin-top:18px;
+}
+.btn-instagram:hover{
+  transform:scale(1.05);
+  background:linear-gradient(45deg, #111, #222);
+}
+
+.btn-instagram img{
+  width:20px;
+  height:20px;
+}
+
 @media(max-width:900px){ .wrap{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
 
 <header class="slide-in">PEAR STORE</header>
-
-<div style="text-align:center; margin-top:16px;">
-<a href="https://www.instagram.com/pear_storre" target="_blank"
-style="background: linear-gradient(45deg, #000, #555);
-color:white; padding:12px 20px; border-radius:12px;
-font-weight:bold; display:inline-block;">
-Síguenos en Instagram
-</a>
-</div>
 
 <div class="wrap">
   <section id="catalogo" class="catalogo"></section>
@@ -144,11 +161,24 @@ Síguenos en Instagram
     <div id="carritoItems"><p>El carrito está vacío.</p></div>
     <div id="total" style="font-weight:bold;margin-top:12px">Total: $0</div>
 
-    <h4>Datos del domicilio</h4>
-    <input type="text" id="nombre" placeholder="Nombre completo">
-    <input type="text" id="calle" placeholder="Calle y número">
-    <input type="text" id="colonia" placeholder="Colonia">
-    <input type="text" id="ciudad" placeholder="Ciudad">
+    <!-- MÉTODO DE ENTREGA -->
+    <h4>Método de entrega</h4>
+
+    <div id="domicilioCaja" class="metodoPago selected" onclick="seleccionarEntrega('domicilio')">
+      <b>Entrega a domicilio</b>
+    </div>
+
+    <div id="personalCaja" class="metodoPago" onclick="seleccionarEntrega('personal')">
+      <b>Entrega personal</b>
+    </div>
+
+    <div id="direccionCampos">
+      <h4>Datos del domicilio</h4>
+      <input type="text" id="nombre" placeholder="Nombre completo">
+      <input type="text" id="calle" placeholder="Calle y número">
+      <input type="text" id="colonia" placeholder="Colonia">
+      <input type="text" id="ciudad" placeholder="Ciudad">
+    </div>
 
     <h4>Método de pago</h4>
 
@@ -167,13 +197,19 @@ Síguenos en Instagram
     </div>
 
     <button class="btn-finalizar" onclick="enviarPedido()">Enviar Pedido</button>
+
+    <!-- NUEVO: BOTÓN INSTAGRAM ABAJO -->
+    <div style="text-align:center;">
+      <a href="https://www.instagram.com/pear_storre" target="_blank" class="btn-instagram">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png">
+        Síguenos en Instagram
+      </a>
+    </div>
+
   </aside>
 </div>
 
 <script>
-// ============================================================================
-// LISTA DE PRODUCTOS — CON RUTAS CORRECTAS (img/...)
-// ============================================================================
 const productos = [
   {id:1,nombre:"AirPods 2 Pro",precio:450,imagenes:["IMG-1235.webp","IMG-1232.webp","IMG-1235.webp"]},
   {id:2,nombre:"AirPods 3ra Generación",precio:450,imagenes:["E14433AB-04B2-4D85-8821-764E59DE4FE6.webp","DF7EDE8C-9CE1-4436-B993-4094D12430DF.webp","D3617BDC-8397-48C0-B488-CAAC985058B9.webp","B82AA671-AEA6-4E14-B9E5-D243345B3999.webp"]},
@@ -183,10 +219,23 @@ const productos = [
 ];
 let carrito = [];
 let metodoPagoSeleccionado = "efectivo";
+let metodoEntrega = "domicilio";
 
-// ============================================================================
-// CATÁLOGO
-// ============================================================================
+function seleccionarEntrega(tipo){
+    metodoEntrega = tipo;
+
+    document.getElementById("domicilioCaja").classList.remove("selected");
+    document.getElementById("personalCaja").classList.remove("selected");
+
+    if(tipo === "domicilio"){
+        document.getElementById("domicilioCaja").classList.add("selected");
+        document.getElementById("direccionCampos").style.display = "block";
+    } else {
+        document.getElementById("personalCaja").classList.add("selected");
+        document.getElementById("direccionCampos").style.display = "none";
+    }
+}
+
 function renderizarCatalogo(){
   const cont=document.getElementById("catalogo"); cont.innerHTML="";
   productos.forEach(p=>{
@@ -224,9 +273,6 @@ function activarCarruseles(){
   });
 }
 
-// ============================================================================
-// CARRITO
-// ============================================================================
 function agregarCarrito(id){
   const p=productos.find(x=>x.id===id);
   let item=carrito.find(x=>x.id===id);
@@ -261,9 +307,6 @@ function eliminar(id){
   actualizarCarrito();
 }
 
-// ============================================================================
-// MÉTODO DE PAGO
-// ============================================================================
 function seleccionarPago(metodo){
   metodoPagoSeleccionado = metodo;
 
@@ -279,21 +322,8 @@ function seleccionarPago(metodo){
   }
 }
 
-// ============================================================================
-// ENVIAR PEDIDO A WHATSAPP
-// ============================================================================
 function enviarPedido(){
   if(carrito.length===0){ alert("El carrito está vacío"); return; }
-
-  const nombre = document.getElementById("nombre").value.trim();
-  const calle = document.getElementById("calle").value.trim();
-  const colonia = document.getElementById("colonia").value.trim();
-  const ciudad = document.getElementById("ciudad").value.trim();
-
-  if(!nombre || !calle || !colonia || !ciudad){
-    alert("Por favor completa todos los campos de domicilio.");
-    return;
-  }
 
   let mensaje = "📦 *NUEVO PEDIDO*%0A%0A";
 
@@ -301,25 +331,37 @@ function enviarPedido(){
     mensaje += `• ${i.nombre} x${i.cantidad} = $${i.precio * i.cantidad}%0A`;
   });
 
-  let total = carrito.reduce((sum,i)=>sum+i.precio*i.cantidad, 0);
+  let total = carrito.reduce((s,i)=>s+i.precio*i.cantidad,0);
   mensaje += `%0A💰 *TOTAL:* $${total}%0A%0A`;
 
-  mensaje += `🏠 *DIRECCIÓN DE ENTREGA*%0A`;
-  mensaje += `Nombre: ${nombre}%0A`;
-  mensaje += `Calle: ${calle}%0A`;
-  mensaje += `Colonia: ${colonia}%0A`;
-  mensaje += `Ciudad: ${ciudad}%0A%0A`;
+  mensaje += `📍 *Método de entrega:* ${metodoEntrega}%0A%0A`;
 
-  mensaje += `💳 *Método de pago:* ${metodoPagoSeleccionado === "efectivo" ? "Efectivo" : "Transferencia Bancaria"}%0A`;
+  if(metodoEntrega==="domicilio"){
+    const nombre=document.getElementById("nombre").value.trim();
+    const calle=document.getElementById("calle").value.trim();
+    const colonia=document.getElementById("colonia").value.trim();
+    const ciudad=document.getElementById("ciudad").value.trim();
 
-  const numero = "8145344751";
-  const waUrl = "https://wa.me/52"+numero+"?text="+mensaje;
+    if(!nombre||!calle||!colonia||!ciudad){
+      alert("Por favor completa todos los campos de domicilio.");
+      return;
+    }
 
-  window.open(waUrl, "_blank");
+    mensaje+=`🏠 *DIRECCIÓN*%0A`;
+    mensaje+=`Nombre: ${nombre}%0A`;
+    mensaje+=`Calle: ${calle}%0A`;
+    mensaje+=`Colonia: ${colonia}%0A`;
+    mensaje+=`Ciudad: ${ciudad}%0A%0A`;
+  }
+
+  mensaje+=`💳 *Método de pago:* ${metodoPagoSeleccionado}%0A`;
+
+  const numero="8145344751";
+  const url="https://wa.me/52"+numero+"?text="+mensaje;
+  window.open(url, "_blank");
 }
 
-// INICIAR
-document.addEventListener("DOMContentLoaded", ()=>{
+document.addEventListener("DOMContentLoaded",()=>{
   renderizarCatalogo();
   actualizarCarrito();
 });
