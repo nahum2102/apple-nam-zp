@@ -24,13 +24,28 @@ a{text-decoration:none}
   60%{opacity:1;transform:translateX(-10%);}
   100%{opacity:1;transform:translateX(0);}
 }
-.slide-in {animation: slideInRight 2s ease-out forwards;}
+.slide-in {animation: slideInRight 1s ease-out forwards;}
 
 header{
   background:#000;color:#fff;padding:20px 0;text-align:center;font-weight:700;
   font-size:28px;letter-spacing:1px;text-transform:uppercase;
   box-shadow:0 4px 12px rgba(0,0,0,0.2);
+  position:relative;
 }
+
+#cartCounter{
+  position:absolute;
+  top:15px;
+  right:20px;
+  background:#fff;       /* Cambié a blanco */
+  color:#000;            /* Texto negro */
+  font-weight:bold;
+  padding:4px 10px;
+  border-radius:50%;
+  font-size:14px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3); /* Para que resalte sobre negro */
+}
+
 
 .wrap{
   width:95%; max-width:1200px;margin:32px auto;
@@ -45,10 +60,21 @@ header{
   background:var(--card); border-radius:14px; padding:18px;
   box-shadow:var(--shadow); text-align:center;
   transition:transform 0.3s, box-shadow 0.3s;
+  position:relative;
 }
 .producto:hover{
   transform:translateY(-4px);
   box-shadow:0 10px 25px rgba(0,0,0,0.12);
+}
+
+.producto.animado{
+  animation: pop 0.3s;
+}
+
+@keyframes pop{
+  0%{transform: scale(1);}
+  50%{transform: scale(1.1);}
+  100%{transform: scale(1);}
 }
 
 .carousel{
@@ -120,9 +146,6 @@ input{
   margin-top:8px; font-size:14px;
 }
 
-/* ----------------------- */
-/* BOTÓN INSTAGRAM MODERNO */
-/* ----------------------- */
 .btn-instagram{
   display:inline-flex;
   align-items:center;
@@ -140,18 +163,34 @@ input{
   transform:scale(1.05);
   background:linear-gradient(45deg, #111, #222);
 }
-
 .btn-instagram img{
   width:20px;
   height:20px;
 }
+
+.modal{
+  display:none;
+  position:fixed;
+  top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.6);
+  justify-content:center; align-items:center;
+}
+.modal-content{
+  background:white; padding:20px; border-radius:10px; max-width:400px; width:90%;
+  text-align:center;
+}
+.modal button{
+  margin:10px; padding:8px 16px; border:none; border-radius:6px; cursor:pointer;
+}
+.modal button.confirm{background:var(--success); color:white;}
+.modal button.cancel{background:#ff3b30; color:white;}
 
 @media(max-width:900px){ .wrap{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
 
-<header class="slide-in">PEAR STORE</header>
+<header class="slide-in">PEAR STORE <span id="cartCounter">0</span></header>
 
 <div class="wrap">
   <section id="catalogo" class="catalogo"></section>
@@ -161,16 +200,9 @@ input{
     <div id="carritoItems"><p>El carrito está vacío.</p></div>
     <div id="total" style="font-weight:bold;margin-top:12px">Total: $0</div>
 
-    <!-- MÉTODO DE ENTREGA -->
     <h4>Método de entrega</h4>
-
-    <div id="domicilioCaja" class="metodoPago selected" onclick="seleccionarEntrega('domicilio')">
-      <b>Entrega a domicilio</b>
-    </div>
-
-    <div id="personalCaja" class="metodoPago" onclick="seleccionarEntrega('personal')">
-      <b>Entrega personal</b>
-    </div>
+    <div id="domicilioCaja" class="metodoPago selected" onclick="seleccionarEntrega('domicilio')"><b>Entrega a domicilio</b></div>
+    <div id="personalCaja" class="metodoPago" onclick="seleccionarEntrega('personal')"><b>Entrega personal</b></div>
 
     <div id="direccionCampos">
       <h4>Datos del domicilio</h4>
@@ -181,7 +213,6 @@ input{
     </div>
 
     <h4>Método de pago</h4>
-
     <div id="transferenciaCaja" class="metodoPago" onclick="seleccionarPago('transferencia')">
       <b>Transferencia Bancaria</b>
       <div id="transferenciaInfo" style="display:none;">
@@ -191,22 +222,25 @@ input{
         <p>Enviar comprobante: <b>8145344751</b></p>
       </div>
     </div>
+    <div id="efectivoCaja" class="metodoPago selected" onclick="seleccionarPago('efectivo')"><b>Efectivo</b></div>
 
-    <div id="efectivoCaja" class="metodoPago selected" onclick="seleccionarPago('efectivo')">
-      <b>Efectivo</b>
-    </div>
+    <button class="btn-finalizar" onclick="abrirModal()">Enviar Pedido</button>
 
-    <button class="btn-finalizar" onclick="enviarPedido()">Enviar Pedido</button>
-
-    <!-- NUEVO: BOTÓN INSTAGRAM ABAJO -->
     <div style="text-align:center;">
       <a href="https://www.instagram.com/pear_storre" target="_blank" class="btn-instagram">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png">
-        Síguenos en Instagram
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png">Síguenos en Instagram
       </a>
     </div>
-
   </aside>
+</div>
+
+<!-- MODAL CONFIRMACIÓN -->
+<div class="modal" id="modalConfirm">
+  <div class="modal-content">
+    <p>¿Deseas enviar tu pedido?</p>
+    <button class="confirm" onclick="confirmarPedido()">Sí</button>
+    <button class="cancel" onclick="cerrarModal()">No</button>
+  </div>
 </div>
 
 <script>
@@ -217,22 +251,21 @@ const productos = [
   {id:4,nombre:"Cable Lightning Original",precio:250,imagenes:["4FF89AC7-8830-4A38-B846-F11A91BE8560.webp","5C736A05-5843-4569-A60B-35ADC7E40789.webp"]},
   {id:5,nombre:"Batería MagSafe",precio:300,imagenes:["3E6EF8DC-C60E-4895-8492-9791AB026C79.webp","A4D0C978-7C77-4380-A5DF-8EB5E4B08675.webp","DE9498AD-7C7C-4BD9-BAAE-C4F040713397.webp"]}
 ];
-let carrito = [];
+
+let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 let metodoPagoSeleccionado = "efectivo";
 let metodoEntrega = "domicilio";
 
 function seleccionarEntrega(tipo){
     metodoEntrega = tipo;
-
     document.getElementById("domicilioCaja").classList.remove("selected");
     document.getElementById("personalCaja").classList.remove("selected");
-
-    if(tipo === "domicilio"){
+    if(tipo==="domicilio"){
         document.getElementById("domicilioCaja").classList.add("selected");
-        document.getElementById("direccionCampos").style.display = "block";
+        document.getElementById("direccionCampos").style.display="block";
     } else {
         document.getElementById("personalCaja").classList.add("selected");
-        document.getElementById("direccionCampos").style.display = "none";
+        document.getElementById("direccionCampos").style.display="none";
     }
 }
 
@@ -248,7 +281,7 @@ function renderizarCatalogo(){
       </div>
       <h4>${p.nombre}</h4>
       <div class="precio">$${p.precio}</div>
-      <button class="btn btn-comprar" onclick="agregarCarrito(${p.id})">Comprar</button>
+      <button class="btn btn-comprar" onclick="agregarCarrito(${p.id}, this)">Comprar</button>
     `;
     cont.appendChild(div);
   });
@@ -261,107 +294,99 @@ function activarCarruseles(){
     const p=productos.find(x=>x.id==id);
     const img=c.querySelector("img");
     let index=0;
-
-    c.querySelector(".next").onclick=()=>{
-      index=(index+1)%p.imagenes.length;
-      img.src=p.imagenes[index];
-    };
-    c.querySelector(".prev").onclick=()=>{
-      index=(index-1+p.imagenes.length)%p.imagenes.length;
-      img.src=p.imagenes[index];
-    };
+    c.querySelector(".next").onclick=()=>{index=(index+1)%p.imagenes.length; img.src=p.imagenes[index];};
+    c.querySelector(".prev").onclick=()=>{index=(index-1+p.imagenes.length)%p.imagenes.length; img.src=p.imagenes[index];};
   });
 }
 
-function agregarCarrito(id){
-  const p=productos.find(x=>x.id===id);
-  let item=carrito.find(x=>x.id===id);
+function agregarCarrito(id, btn){
+  const p = productos.find(x=>x.id===id);
+  let item = carrito.find(x=>x.id===id);
   if(item) item.cantidad++;
   else carrito.push({id:p.id,nombre:p.nombre,precio:p.precio,cantidad:1});
+  actualizarCarrito();
+  // Animación
+  const productoDiv = btn.closest(".producto");
+  productoDiv.classList.add("animado");
+  setTimeout(()=>productoDiv.classList.remove("animado"), 300);
+}
+
+function cambiarCantidad(id, cambio){
+  let item = carrito.find(x=>x.id===id);
+  if(!item) return;
+  item.cantidad += cambio;
+  if(item.cantidad <=0) carrito = carrito.filter(x=>x.id!==id);
   actualizarCarrito();
 }
 
 function actualizarCarrito(){
-  const cont=document.getElementById("carritoItems"); cont.innerHTML="";
-  if(carrito.length===0){
-    cont.innerHTML="<p>El carrito está vacío.</p>";
-    document.getElementById("total").innerText="Total: $0";
-    return;
-  }
-  let total=0;
+  localStorage.setItem("carrito", JSON.stringify(carrito));
+  const cont=document.getElementById("carritoItems"); 
+  cont.innerHTML="";
+  if(carrito.length===0){ cont.innerHTML="<p>El carrito está vacío.</p>"; document.getElementById("total").innerText="Total: $0"; }
+  let total=0, totalCantidad=0;
   carrito.forEach(i=>{
     const sub=i.precio*i.cantidad;
-    total+=sub;
+    total+=sub; totalCantidad+=i.cantidad;
     cont.innerHTML+=`
       <div class="linea-item">
-        <div><b>${i.nombre}</b><br>$${i.precio} x ${i.cantidad} = $${sub}</div>
-        <button class="btn-eliminar" onclick="eliminar(${i.id})">X</button>
+        <div>
+          <b>${i.nombre}</b><br>
+          $${i.precio} c/u
+          <br>
+          <div style="margin-top:6px;">
+            <button onclick="cambiarCantidad(${i.id}, -1)" style="padding:4px 10px;">−</button>
+            <span style="margin:0 8px; font-weight:bold;">${i.cantidad}</span>
+            <button onclick="cambiarCantidad(${i.id}, 1)" style="padding:4px 10px;">+</button>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div>$${sub}</div>
+          <button class="btn-eliminar" onclick="cambiarCantidad(${i.id}, -${i.cantidad})" style="margin-top:6px;">X</button>
+        </div>
       </div>
     `;
   });
-  document.getElementById("total").innerText="Total: $"+total;
+  document.getElementById("total").innerText="Total: $" + total;
+  document.getElementById("cartCounter").innerText = totalCantidad;
 }
 
-function eliminar(id){
-  carrito=carrito.filter(i=>i.id!==id);
-  actualizarCarrito();
-}
+function eliminar(id){cambiarCantidad(id,-carrito.find(x=>x.id===id).cantidad);}
 
 function seleccionarPago(metodo){
-  metodoPagoSeleccionado = metodo;
-
+  metodoPagoSeleccionado=metodo;
   document.getElementById("transferenciaCaja").classList.remove("selected");
   document.getElementById("efectivoCaja").classList.remove("selected");
-
-  if(metodo === "transferencia"){
-    document.getElementById("transferenciaCaja").classList.add("selected");
-    document.getElementById("transferenciaInfo").style.display = "block";
-  } else {
-    document.getElementById("efectivoCaja").classList.add("selected");
-    document.getElementById("transferenciaInfo").style.display = "none";
-  }
+  if(metodo==="transferencia"){document.getElementById("transferenciaCaja").classList.add("selected"); document.getElementById("transferenciaInfo").style.display="block";}
+  else{document.getElementById("efectivoCaja").classList.add("selected"); document.getElementById("transferenciaInfo").style.display="none";}
 }
 
-function enviarPedido(){
+function abrirModal(){document.getElementById("modalConfirm").style.display="flex";}
+function cerrarModal(){document.getElementById("modalConfirm").style.display="none";}
+
+function confirmarPedido(){
+  cerrarModal();
   if(carrito.length===0){ alert("El carrito está vacío"); return; }
-
   let mensaje = "📦 *NUEVO PEDIDO*%0A%0A";
-
-  carrito.forEach(i=>{
-    mensaje += `• ${i.nombre} x${i.cantidad} = $${i.precio * i.cantidad}%0A`;
-  });
-
+  carrito.forEach(i=>mensaje+=`• ${i.nombre} x${i.cantidad} = $${i.precio*i.cantidad}%0A`);
   let total = carrito.reduce((s,i)=>s+i.precio*i.cantidad,0);
-  mensaje += `%0A💰 *TOTAL:* $${total}%0A%0A`;
-
-  mensaje += `📍 *Método de entrega:* ${metodoEntrega}%0A%0A`;
-
+  mensaje+=`%0A💰 *TOTAL:* $${total}%0A%0A`;
+  mensaje+=`📍 *Método de entrega:* ${metodoEntrega}%0A%0A`;
   if(metodoEntrega==="domicilio"){
     const nombre=document.getElementById("nombre").value.trim();
     const calle=document.getElementById("calle").value.trim();
     const colonia=document.getElementById("colonia").value.trim();
     const ciudad=document.getElementById("ciudad").value.trim();
-
-    if(!nombre||!calle||!colonia||!ciudad){
-      alert("Por favor completa todos los campos de domicilio.");
-      return;
-    }
-
-    mensaje+=`🏠 *DIRECCIÓN*%0A`;
-    mensaje+=`Nombre: ${nombre}%0A`;
-    mensaje+=`Calle: ${calle}%0A`;
-    mensaje+=`Colonia: ${colonia}%0A`;
-    mensaje+=`Ciudad: ${ciudad}%0A%0A`;
+    if(!nombre||!calle||!colonia||!ciudad){alert("Completa todos los campos de domicilio."); return;}
+    mensaje+=`🏠 *DIRECCIÓN*%0ANombre: ${nombre}%0ACalle: ${calle}%0AColonia: ${colonia}%0ACiudad: ${ciudad}%0A%0A`;
   }
-
   mensaje+=`💳 *Método de pago:* ${metodoPagoSeleccionado}%0A`;
-
   const numero="8145344751";
   const url="https://wa.me/52"+numero+"?text="+mensaje;
-  window.open(url, "_blank");
+  window.open(url,"_blank");
 }
 
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener("DOMContentLoaded", ()=>{
   renderizarCatalogo();
   actualizarCarrito();
 });
