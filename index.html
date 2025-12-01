@@ -19,13 +19,7 @@
 body{margin:0;font-family:'Segoe UI', sans-serif;background:var(--bg);color:#111;line-height:1.5}
 a{text-decoration:none}
 
-@keyframes slideInRight {
-  0%{opacity:0;transform:translateX(120%);}
-  60%{opacity:1;transform:translateX(-10%);}
-  100%{opacity:1;transform:translateX(0);}
-}
-.slide-in {animation: slideInRight 1s ease-out forwards;}
-
+/* Header */
 header{
   background:#000;color:#fff;padding:20px 0;text-align:center;font-weight:700;
   font-size:28px;letter-spacing:1px;text-transform:uppercase;
@@ -37,21 +31,36 @@ header{
   position:absolute;
   top:15px;
   right:20px;
-  background:#fff;       /* Cambié a blanco */
-  color:#000;            /* Texto negro */
+  background:#fff;
+  color:#000;
   font-weight:bold;
   padding:4px 10px;
   border-radius:50%;
   font-size:14px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3); /* Para que resalte sobre negro */
+  box-shadow:0 2px 6px rgba(0,0,0,0.3);
 }
 
+/* BOTÓN CARRITO */
+#btnCarrito{
+  position:absolute;
+  right:70px;
+  top:12px;
+  background:#fff;
+  color:#000;
+  padding:6px 12px;
+  border-radius:8px;
+  border:0;
+  cursor:pointer;
+  font-weight:bold;
+}
 
+/* Layout */
 .wrap{
   width:95%; max-width:1200px;margin:32px auto;
-  display:grid; grid-template-columns:1fr 360px; gap:28px;
+  transition:0.45s ease;
 }
 
+/* Catálogo */
 .catalogo{
   display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:20px;
 }
@@ -67,16 +76,7 @@ header{
   box-shadow:0 10px 25px rgba(0,0,0,0.12);
 }
 
-.producto.animado{
-  animation: pop 0.3s;
-}
-
-@keyframes pop{
-  0%{transform: scale(1);}
-  50%{transform: scale(1.1);}
-  100%{transform: scale(1);}
-}
-
+/* Carrusel */
 .carousel{
   width:100%; height:180px; position:relative; overflow:hidden;
   border-radius:12px; margin-bottom:12px;
@@ -84,7 +84,6 @@ header{
 .carousel img{
   width:100%; height:100%; object-fit:cover;
 }
-
 .btn-slide{
   position:absolute; top:50%; transform:translateY(-50%);
   background:rgba(0,0,0,0.5); color:white; border:none;
@@ -94,9 +93,7 @@ header{
 }
 .prev{left:8px} .next{right:8px}
 
-.producto h4{margin:10px 0;font-size:17px;font-weight:600;color:#222}
-.producto .precio{font-weight:bold; margin:8px 0; font-size:16px;color:#000}
-
+/* Botón comprar */
 .btn{
   padding:10px 16px; border-radius:8px; border:0; cursor:pointer;
   font-weight:600; transition:0.3s;
@@ -104,21 +101,95 @@ header{
 .btn-comprar{background:var(--accent); color:#fff}
 .btn-comprar:hover{background:var(--accent-hover)}
 
-aside{
-  background:#fff; padding:20px; border-radius:14px; box-shadow:var(--shadow);
-  position:sticky; top:20px;
+/* Carrito lateral */
+.panel-carrito{
+  position:fixed;
+  top:0;
+  right:-360px;
+  width:360px;
+  height:100%;
+  background:white;
+  padding:20px;
+  box-shadow:-4px 0 15px rgba(0,0,0,0.25);
+  transition:right 0.3s ease;
+  z-index:9999;
+  overflow-y:auto;
+  touch-action:none;
+}
+.panel-carrito.abierto{
+  right:0;
 }
 
-.linea-item{
-  display:flex; justify-content:space-between; padding:8px 0;
-  border-bottom:1px solid #eee; font-size:14px;
+.cerrar-btn{
+  background:#ff3b30;
+  color:white;
+  border:0;
+  padding:6px 10px;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:bold;
 }
 
-.btn-eliminar{
-  background:#ff3b30; color:#fff; border:0; border-radius:6px;
-  padding:6px 10px; cursor:pointer;
+.carrito-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
 }
-.btn-eliminar:hover{background:#e02a20;}
+
+/* Fondo oscuro */
+.fondo-oscuro{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.45);
+  z-index:9000;
+  opacity:1;
+  transition:0.4s ease;
+}
+.fondo-oscuro.oculto{
+  opacity:0;
+  pointer-events:none;
+}
+
+/* Blur del contenido */
+.contenido-desplazado{
+  transform:translateX(-220px);
+  filter:blur(3px);
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #111;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 10px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: 0.4s ease;
+  z-index: 99999;
+  font-weight: bold;
+}
+.toast.mostrar {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Pago */
+.metodoPago{
+  border:1px solid #ccc; border-radius:10px; padding:14px;
+  margin-bottom:12px; cursor:pointer; transition:0.3s;
+  background:#f9f9f9; font-size:15px;
+}
+.metodoPago.selected{
+  border-color:var(--accent);
+  background:#eaeaea;
+}
 
 .btn-finalizar{
   background:var(--success); color:#fff; width:100%;
@@ -132,159 +203,117 @@ input{
   border-radius:8px; border:1px solid #ccc; font-size:14px;
 }
 
-.metodoPago{
-  border:1px solid #ccc; border-radius:10px; padding:14px;
-  margin-bottom:12px; cursor:pointer; transition:0.3s;
-  background:#f9f9f9; font-size:15px;
-}
-.metodoPago.selected{
-  border-color:var(--accent); background:#eaeaea;
+.btn-eliminar{
+  background:#ff3b30; color:#fff; border:0; border-radius:6px;
+  padding:6px 10px; cursor:pointer;
 }
 
-#transferenciaInfo{
-  background:#f1f1f1; padding:12px; border-radius:8px;
-  margin-top:8px; font-size:14px;
+.linea-item{
+  display:flex; justify-content:space-between; padding:8px 0;
+  border-bottom:1px solid #eee; font-size:14px;
 }
-
-.btn-instagram{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  padding:12px 20px;
-  border-radius:12px;
-  font-weight:bold;
-  font-size:15px;
-  color:white;
-  background:linear-gradient(45deg, #000, #444);
-  transition:0.3s;
-  margin-top:18px;
-}
-.btn-instagram:hover{
-  transform:scale(1.05);
-  background:linear-gradient(45deg, #111, #222);
-}
-.btn-instagram img{
-  width:20px;
-  height:20px;
-}
-
-.modal{
-  display:none;
-  position:fixed;
-  top:0; left:0; width:100%; height:100%;
-  background:rgba(0,0,0,0.6);
-  justify-content:center; align-items:center;
-}
-.modal-content{
-  background:white; padding:20px; border-radius:10px; max-width:400px; width:90%;
-  text-align:center;
-}
-.modal button{
-  margin:10px; padding:8px 16px; border:none; border-radius:6px; cursor:pointer;
-}
-.modal button.confirm{background:var(--success); color:white;}
-.modal button.cancel{background:#ff3b30; color:white;}
-
-@media(max-width:900px){ .wrap{grid-template-columns:1fr} }
 </style>
 </head>
+
 <body>
 
-<header class="slide-in">PEAR STORE <span id="cartCounter">0</span></header>
+<header>
+  PEAR STORE 
+  <span id="cartCounter">0</span>
+
+  <!-- Botón Carrito -->
+  <button id="btnCarrito" onclick="abrirCarrito()">Carrito</button>
+</header>
+
+<!-- Fondo oscuro -->
+<div id="fondoOscuro" class="fondo-oscuro oculto"></div>
+
+<!-- Toast -->
+<div id="toast" class="toast">Producto agregado ✔️</div>
 
 <div class="wrap">
   <section id="catalogo" class="catalogo"></section>
-
-  <aside>
-    <h3>Carrito</h3>
-    <div id="carritoItems"><p>El carrito está vacío.</p></div>
-    <div id="total" style="font-weight:bold;margin-top:12px">Total: $0</div>
-
-    <h4>Método de entrega</h4>
-    <div id="domicilioCaja" class="metodoPago selected" onclick="seleccionarEntrega('domicilio')"><b>Entrega a domicilio</b></div>
-    <div id="personalCaja" class="metodoPago" onclick="seleccionarEntrega('personal')"><b>Entrega personal</b></div>
-
-    <div id="direccionCampos">
-      <h4>Datos del domicilio</h4>
-      <input type="text" id="nombre" placeholder="Nombre completo">
-      <input type="text" id="calle" placeholder="Calle y número">
-      <input type="text" id="colonia" placeholder="Colonia">
-      <input type="text" id="ciudad" placeholder="Ciudad">
-    </div>
-
-    <h4>Método de pago</h4>
-    <div id="transferenciaCaja" class="metodoPago" onclick="seleccionarPago('transferencia')">
-      <b>Transferencia Bancaria</b>
-      <div id="transferenciaInfo" style="display:none;">
-        <p>Banco: <b>Spin by OXXO</b></p>
-        <p>Cuenta/CLABE: <b>728969000160872559</b></p>
-        <p>Titular: <b>Nahum Aquino</b></p>
-        <p>Enviar comprobante: <b>8145344751</b></p>
-      </div>
-    </div>
-    <div id="efectivoCaja" class="metodoPago selected" onclick="seleccionarPago('efectivo')"><b>Efectivo</b></div>
-
-    <button class="btn-finalizar" onclick="abrirModal()">Enviar Pedido</button>
-
-    <div style="text-align:center;">
-      <a href="https://www.instagram.com/pear_storre" target="_blank" class="btn-instagram">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png">Síguenos en Instagram
-      </a>
-    </div>
-  </aside>
 </div>
 
-<!-- MODAL CONFIRMACIÓN -->
-<div class="modal" id="modalConfirm">
-  <div class="modal-content">
-    <p>¿Deseas enviar tu pedido?</p>
-    <button class="confirm" onclick="confirmarPedido()">Sí</button>
-    <button class="cancel" onclick="cerrarModal()">No</button>
+<!-- PANEL LATERAL DEL CARRITO -->
+<div id="panelCarrito" class="panel-carrito">
+  <div class="carrito-header">
+    <h3>Carrito</h3>
+    <button class="cerrar-btn" onclick="cerrarCarrito()">X</button>
   </div>
+
+  <div id="carritoItems"><p>El carrito está vacío.</p></div>
+  <div id="total" style="font-weight:bold;margin-top:12px">Total: $0</div>
+
+  <h4>Método de entrega</h4>
+  <div id="domicilioCaja" class="metodoPago selected" onclick="seleccionarEntrega('domicilio')"><b>Entrega a domicilio</b></div>
+  <div id="personalCaja" class="metodoPago" onclick="seleccionarEntrega('personal')"><b>Entrega personal</b></div>
+
+  <div id="direccionCampos">
+    <h4>Datos del domicilio</h4>
+    <input type="text" id="nombre" placeholder="Nombre completo">
+    <input type="text" id="calle" placeholder="Calle y número">
+    <input type="text" id="colonia" placeholder="Colonia">
+    <input type="text" id="ciudad" placeholder="Ciudad">
+  </div>
+
+  <h4>Método de pago</h4>
+  <div id="transferenciaCaja" class="metodoPago" onclick="seleccionarPago('transferencia')">
+    <b>Transferencia Bancaria</b>
+    <div id="transferenciaInfo" style="display:none;">
+      <p>Banco: <b>Spin by OXXO</b></p>
+      <p>Cuenta/CLABE: <b>728969000160872559</b></p>
+      <p>Titular: <b>Nahum Aquino</b></p>
+      <p>Enviar comprobante: <b>8145344751</b></p>
+    </div>
+  </div>
+
+  <div id="efectivoCaja" class="metodoPago selected" onclick="seleccionarPago('efectivo')"><b>Efectivo</b></div>
+
+  <button class="btn-finalizar" onclick="abrirModal()">Enviar Pedido</button>
 </div>
 
 <script>
+/* ----------------------------
+   PRODUCTOS
+---------------------------- */
 const productos = [
   {id:1,nombre:"AirPods 2 Pro",precio:450,imagenes:["IMG-1235.webp","IMG-1232.webp","IMG-1235.webp"]},
-  {id:2,nombre:"AirPods 3ra Generación",precio:450,imagenes:["E14433AB-04B2-4D85-8821-764E59DE4FE6.webp","DF7EDE8C-9CE1-4436-B993-4094D12430DF.webp","D3617BDC-8397-48C0-B488-CAAC985058B9.webp","B82AA671-AEA6-4E14-B9E5-D243345B3999.webp"]},
+  {id:2,nombre:"AirPods 3ra Generación",precio:450,imagenes:["E14433AB-04B2-4D85-8821-764E59DE4FE6.webp","DF7EDE8C-9CE1-4436-B993-4094D12430DF.webp","D3617BDC-8397-48C0-B488-CAAC985058B9.webp"]},
   {id:3,nombre:"Cargador USB-C 35W",precio:250,imagenes:["82B70C5A-37C7-4337-8C92-CD52E626A8C1.webp","926667B9-EC57-43F3-A745-544619645143.webp"]},
-  {id:4,nombre:"Cable Lightning Original",precio:250,imagenes:["4FF89AC7-8830-4A38-B846-F11A91BE8560.webp","5C736A05-5843-4569-A60B-35ADC7E40789.webp"]},
-  {id:5,nombre:"Batería MagSafe",precio:300,imagenes:["3E6EF8DC-C60E-4895-8492-9791AB026C79.webp","A4D0C978-7C77-4380-A5DF-8EB5E4B08675.webp","DE9498AD-7C7C-4BD9-BAAE-C4F040713397.webp"]}
+  {id:4,nombre:"Cable Lightning Original",precio:250,imagenes:["4FF89AC7-8830-4A38-B846-F11A91BE8560.webp"]},
+  {id:5,nombre:"Batería MagSafe",precio:300,imagenes:["3E6EF8DC-C60E-4895-8492-9791AB026C79.webp"]},
 ];
 
 let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 let metodoPagoSeleccionado = "efectivo";
 let metodoEntrega = "domicilio";
 
-function seleccionarEntrega(tipo){
-    metodoEntrega = tipo;
-    document.getElementById("domicilioCaja").classList.remove("selected");
-    document.getElementById("personalCaja").classList.remove("selected");
-    if(tipo==="domicilio"){
-        document.getElementById("domicilioCaja").classList.add("selected");
-        document.getElementById("direccionCampos").style.display="block";
-    } else {
-        document.getElementById("personalCaja").classList.add("selected");
-        document.getElementById("direccionCampos").style.display="none";
-    }
-}
-
+/* ----------------------------
+   CATALOGO
+---------------------------- */
 function renderizarCatalogo(){
-  const cont=document.getElementById("catalogo"); cont.innerHTML="";
+  const cont = document.getElementById("catalogo");
+  cont.innerHTML = "";
+
   productos.forEach(p=>{
-    const div=document.createElement("div"); div.className="producto";
+    const div=document.createElement("div");
+    div.className="producto";
     div.innerHTML=`
       <div class="carousel" data-id="${p.id}">
-        <img src="${p.imagenes[0]}" data-index="0" alt="${p.nombre}">
+        <img src="${p.imagenes[0]}" data-index="0">
         <button class="btn-slide prev">‹</button>
         <button class="btn-slide next">›</button>
       </div>
+
       <h4>${p.nombre}</h4>
       <div class="precio">$${p.precio}</div>
-      <button class="btn btn-comprar" onclick="agregarCarrito(${p.id}, this)">Comprar</button>
+      <button class="btn btn-comprar" onclick="agregarCarrito(${p.id})">Comprar</button>
     `;
+
     cont.appendChild(div);
   });
+
   activarCarruseles();
 }
 
@@ -294,40 +323,43 @@ function activarCarruseles(){
     const p=productos.find(x=>x.id==id);
     const img=c.querySelector("img");
     let index=0;
-    c.querySelector(".next").onclick=()=>{index=(index+1)%p.imagenes.length; img.src=p.imagenes[index];};
-    c.querySelector(".prev").onclick=()=>{index=(index-1+p.imagenes.length)%p.imagenes.length; img.src=p.imagenes[index];};
+
+    c.querySelector(".next").onclick=()=>{
+      index=(index+1)%p.imagenes.length;
+      img.src=p.imagenes[index];
+    };
+
+    c.querySelector(".prev").onclick=()=>{
+      index=(index-1+p.imagenes.length)%p.imagenes.length;
+      img.src=p.imagenes[index];
+    };
   });
 }
 
-function agregarCarrito(id, btn){
-  const p = productos.find(x=>x.id===id);
-  let item = carrito.find(x=>x.id===id);
-  if(item) item.cantidad++;
-  else carrito.push({id:p.id,nombre:p.nombre,precio:p.precio,cantidad:1});
-  actualizarCarrito();
-  // Animación
-  const productoDiv = btn.closest(".producto");
-  productoDiv.classList.add("animado");
-  setTimeout(()=>productoDiv.classList.remove("animado"), 300);
-}
-
-function cambiarCantidad(id, cambio){
-  let item = carrito.find(x=>x.id===id);
-  if(!item) return;
-  item.cantidad += cambio;
-  if(item.cantidad <=0) carrito = carrito.filter(x=>x.id!==id);
-  actualizarCarrito();
-}
-
+/* ----------------------------
+   CARRITO
+---------------------------- */
 function actualizarCarrito(){
   localStorage.setItem("carrito", JSON.stringify(carrito));
-  const cont=document.getElementById("carritoItems"); 
+
+  const cont=document.getElementById("carritoItems");
   cont.innerHTML="";
-  if(carrito.length===0){ cont.innerHTML="<p>El carrito está vacío.</p>"; document.getElementById("total").innerText="Total: $0"; }
-  let total=0, totalCantidad=0;
+
+  if(carrito.length===0){
+    cont.innerHTML="<p>El carrito está vacío.</p>";
+    document.getElementById("total").innerText="Total: $0";
+    document.getElementById("cartCounter").innerText = 0;
+    return;
+  }
+
+  let total=0;
+  let totalCantidad=0;
+
   carrito.forEach(i=>{
     const sub=i.precio*i.cantidad;
-    total+=sub; totalCantidad+=i.cantidad;
+    total+=sub;
+    totalCantidad+=i.cantidad;
+
     cont.innerHTML+=`
       <div class="linea-item">
         <div>
@@ -340,52 +372,123 @@ function actualizarCarrito(){
             <button onclick="cambiarCantidad(${i.id}, 1)" style="padding:4px 10px;">+</button>
           </div>
         </div>
+
         <div style="text-align:right;">
           <div>$${sub}</div>
-          <button class="btn-eliminar" onclick="cambiarCantidad(${i.id}, -${i.cantidad})" style="margin-top:6px;">X</button>
+          <button class="btn-eliminar" onclick="cambiarCantidad(${i.id}, -${i.cantidad})">X</button>
         </div>
       </div>
     `;
   });
-  document.getElementById("total").innerText="Total: $" + total;
+
+  document.getElementById("total").innerText = "Total: $" + total;
   document.getElementById("cartCounter").innerText = totalCantidad;
 }
 
-function eliminar(id){cambiarCantidad(id,-carrito.find(x=>x.id===id).cantidad);}
+function cambiarCantidad(id, cambio){
+  let item = carrito.find(x=>x.id===id);
+  if(!item) return;
+
+  item.cantidad += cambio;
+  if(item.cantidad <=0){
+    carrito = carrito.filter(x=>x.id!==id);
+  }
+
+  actualizarCarrito();
+}
+
+/* ----------------------------
+   TOAST
+---------------------------- */
+function mostrarToast(){
+  const t = document.getElementById("toast");
+  t.classList.add("mostrar");
+  setTimeout(()=> t.classList.remove("mostrar"), 2000);
+}
+
+/* ----------------------------
+   ABRIR / CERRAR CARRITO
+---------------------------- */
+function abrirCarrito(){
+  document.getElementById("panelCarrito").classList.add("abierto");
+  document.getElementById("fondoOscuro").classList.remove("oculto");
+  document.querySelector(".wrap").classList.add("contenido-desplazado");
+}
+
+function cerrarCarrito(){
+  document.getElementById("panelCarrito").classList.remove("abierto");
+  document.getElementById("fondoOscuro").classList.add("oculto");
+  document.querySelector(".wrap").classList.remove("contenido-desplazado");
+}
+
+/* Cerrar al hacer clic fuera */
+document.getElementById("fondoOscuro").addEventListener("click", cerrarCarrito);
+
+/* ----------------------------
+   DRAG PARA CERRAR
+---------------------------- */
+let startX = 0;
+
+document.getElementById("panelCarrito").addEventListener("touchstart", e=>{
+  startX = e.touches[0].clientX;
+});
+
+document.getElementById("panelCarrito").addEventListener("touchmove", e=>{
+  let diff = startX - e.touches[0].clientX;
+
+  if(diff < -60){
+    cerrarCarrito();
+  }
+});
+
+/* ----------------------------
+   AGREGAR AL CARRITO
+---------------------------- */
+function agregarCarrito(id){
+  const p = productos.find(x=>x.id===id);
+  let item = carrito.find(x=>x.id===id);
+
+  if(item) item.cantidad++;
+  else carrito.push({id:p.id,nombre:p.nombre,precio:p.precio,cantidad:1});
+
+  actualizarCarrito();
+  mostrarToast();
+}
+
+/* ----------------------------
+   ENTREGA Y PAGO
+---------------------------- */
+function seleccionarEntrega(tipo){
+  metodoEntrega = tipo;
+
+  document.getElementById("domicilioCaja").classList.remove("selected");
+  document.getElementById("personalCaja").classList.remove("selected");
+
+  if(tipo==="domicilio"){
+    document.getElementById("domicilioCaja").classList.add("selected");
+    document.getElementById("direccionCampos").style.display="block";
+  } else {
+    document.getElementById("personalCaja").classList.add("selected");
+    document.getElementById("direccionCampos").style.display="none";
+  }
+}
 
 function seleccionarPago(metodo){
-  metodoPagoSeleccionado=metodo;
+  metodoPagoSeleccionado = metodo;
+
   document.getElementById("transferenciaCaja").classList.remove("selected");
   document.getElementById("efectivoCaja").classList.remove("selected");
-  if(metodo==="transferencia"){document.getElementById("transferenciaCaja").classList.add("selected"); document.getElementById("transferenciaInfo").style.display="block";}
-  else{document.getElementById("efectivoCaja").classList.add("selected"); document.getElementById("transferenciaInfo").style.display="none";}
-}
 
-function abrirModal(){document.getElementById("modalConfirm").style.display="flex";}
-function cerrarModal(){document.getElementById("modalConfirm").style.display="none";}
-
-function confirmarPedido(){
-  cerrarModal();
-  if(carrito.length===0){ alert("El carrito está vacío"); return; }
-  let mensaje = "📦 *NUEVO PEDIDO*%0A%0A";
-  carrito.forEach(i=>mensaje+=`• ${i.nombre} x${i.cantidad} = $${i.precio*i.cantidad}%0A`);
-  let total = carrito.reduce((s,i)=>s+i.precio*i.cantidad,0);
-  mensaje+=`%0A💰 *TOTAL:* $${total}%0A%0A`;
-  mensaje+=`📍 *Método de entrega:* ${metodoEntrega}%0A%0A`;
-  if(metodoEntrega==="domicilio"){
-    const nombre=document.getElementById("nombre").value.trim();
-    const calle=document.getElementById("calle").value.trim();
-    const colonia=document.getElementById("colonia").value.trim();
-    const ciudad=document.getElementById("ciudad").value.trim();
-    if(!nombre||!calle||!colonia||!ciudad){alert("Completa todos los campos de domicilio."); return;}
-    mensaje+=`🏠 *DIRECCIÓN*%0ANombre: ${nombre}%0ACalle: ${calle}%0AColonia: ${colonia}%0ACiudad: ${ciudad}%0A%0A`;
+  if(metodo==="transferencia"){
+    document.getElementById("transferenciaCaja").classList.add("selected");
+    document.getElementById("transferenciaInfo").style.display="block";
+  } else {
+    document.getElementById("efectivoCaja").classList.add("selected");
+    document.getElementById("transferenciaInfo").style.display="none";
   }
-  mensaje+=`💳 *Método de pago:* ${metodoPagoSeleccionado}%0A`;
-  const numero="8145344751";
-  const url="https://wa.me/52"+numero+"?text="+mensaje;
-  window.open(url,"_blank");
 }
 
+/* Inicio */
 document.addEventListener("DOMContentLoaded", ()=>{
   renderizarCatalogo();
   actualizarCarrito();
