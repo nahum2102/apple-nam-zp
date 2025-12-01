@@ -291,7 +291,7 @@ input{
 
   <!-- Botón siempre visible -->
   <div class="footer-carrito">
-    <button class="btn-finalizar" onclick="abrirModal()">Enviar Pedido</button>
+    <button class="btn-finalizar" onclick="abrirWhatsApp()">Enviar Pedido</button>
   </div>
 </div>
 
@@ -507,11 +507,46 @@ function seleccionarPago(metodo){
   }
 }
 
-/* Inicio */
-document.addEventListener("DOMContentLoaded", ()=>{
-  renderizarCatalogo();
-  actualizarCarrito();
-});
+/* ----------------------------
+   ENVIAR PEDIDO POR WHATSAPP
+---------------------------- */
+function abrirWhatsApp(){
+  if(carrito.length===0){
+    alert("El carrito está vacío.");
+    return;
+  }
+
+  let mensaje = "📦 *Pedido PEAR STORE*%0A";
+  mensaje += "Método de entrega: " + (metodoEntrega==="domicilio" ? "Domicilio" : "Entrega personal") + "%0A";
+  mensaje += "Método de pago: " + (metodoPagoSeleccionado==="transferencia" ? "Transferencia" : "Efectivo") + "%0A%0A";
+
+  carrito.forEach(i=>{
+    mensaje += `${i.nombre} - ${i.cantidad} x $${i.precio} = $${i.cantidad*i.precio}%0A`;
+  });
+
+  const total = carrito.reduce((sum, i)=>sum + i.precio*i.cantidad, 0);
+  mensaje += `%0ATotal: $${total}%0A`;
+
+  if(metodoEntrega==="domicilio"){
+    const nombre=document.getElementById("nombre").value;
+    const calle=document.getElementById("calle").value;
+    const colonia=document.getElementById("colonia").value;
+    const ciudad=document.getElementById("ciudad").value;
+    mensaje += `%0ADatos de envío:%0ANombre: ${nombre}%0ACalle: ${calle}%0AColonia: ${colonia}%0ACiudad: ${ciudad}`;
+  }
+
+  // Número de WhatsApp (sin +, formato internacional)
+  const numero = "5218145344751"; // México ejemplo
+  const url = `https://wa.me/${numero}?text=${mensaje}`;
+
+  window.open(url,"_blank");
+}
+
+/* ----------------------------
+   INICIALIZACIÓN
+---------------------------- */
+renderizarCatalogo();
+actualizarCarrito();
 </script>
 
 </body>
